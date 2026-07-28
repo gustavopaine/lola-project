@@ -36,8 +36,44 @@ SCRIPT_DIA_1 = (
     "Seguime para que te muestre todo lo que estamos cocinando."
 )
 
+SCRIPT_DIA_3 = (
+    "Uy, esto tiene una pinta... a ver, a ver. Mmm, no, esperá. Esto "
+    "está buenísimo. El shawarma de BIG GOOD tiene una salsa que no sé "
+    "ni qué tiene pero no puedo parar. Andá a probarlo, en serio."
+)
+
+SCRIPT_DIA_7 = (
+    "Bueno, me preguntaron un montón cuál es mi combo favorito, así "
+    "que les cuento: para mí no hay nada como el shawarma con papas y "
+    "una jugosa bien fría. Pero contame vos, ¿cuál es el tuyo? "
+    "Dejámelo en los comentarios que lo leo todo."
+)
+
+SCRIPT_DIA_9 = (
+    "Miren el tamaño de esto. Esta es la hamburguesa gigante de BIG "
+    "GOOD, con doble carne y cheddar derretido. Si tenés hambre de "
+    "verdad, esta es la tuya."
+)
+
+SCRIPT_DIA_11 = (
+    "Hoy les muestro cómo es un día acá en BIG GOOD. Desde que "
+    "prendemos la parrilla tempranito hasta que llega la primera cola "
+    "de gente con hambre. Esto no para en todo el día, y la verdad "
+    "que me encanta."
+)
+
+SCRIPT_DIA_13 = (
+    "Atención, esta semana tenemos una promo que no se pueden perder: "
+    "shawarma más papas más bebida a un precio que no van a creer. "
+    "Solo por tiempo limitado, así que no esperes mucho."
+)
+
 GUIONES = {
     "dia_1": SCRIPT_DIA_1,
-    # "dia_3": "...",
-    # "dia_5": "...",
+    "dia_3": SCRIPT_DIA_3,
+    "dia_7": SCRIPT_DIA_7,
+    "dia_9": SCRIPT_DIA_9,
+    "dia_11": SCRIPT_DIA_11,
+    "dia_13": SCRIPT_DIA_13,
+    # dia_5 y dia_14 son contenido visual/interactivo, sin guion hablado
 }
