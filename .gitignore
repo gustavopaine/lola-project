@@ -1,0 +1,8 @@
+.env
+venv/
+__pycache__/
+*.pyc
+examples/source_image/*.png
+!examples/source_image/lola_512.png
+examples/driven_audio/*.wav
+results/

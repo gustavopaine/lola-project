@@ -1,0 +1,15 @@
+# Nota: este archivo es de referencia para el entorno LOCAL en
+# VS Code (solo autocompletado/lint, sin GPU). La instalación
+# real para generar contenido se hace en Colab, con las
+# versiones específicas que requieren SDXL/SadTalker (ver
+# colab_bootstrap.ipynb).
+
+torch
+diffusers
+transformers
+accelerate
+gTTS
+TTS
+Pillow
+python-dotenv
+openai
