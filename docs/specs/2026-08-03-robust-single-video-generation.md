@@ -1,6 +1,6 @@
 # Generación robusta de un video (retries + idempotencia)
 
-Status: Draft — not for implementation
+Status: Implemented (2026-08-03)
 
 ## Review summary
 
