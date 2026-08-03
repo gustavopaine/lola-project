@@ -151,3 +151,24 @@ def test_create_ai_influencer_raises_after_exhausting_retries(tmp_path, monkeypa
         create_ai_influencer("img.png", "audio.wav", result_dir=str(tmp_path), max_retries=1)
 
     assert len(calls) == 2  # intento inicial + 1 reintento
+
+
+def test_create_ai_influencer_prints_returncode_and_stdout_on_failure(tmp_path, monkeypatch, capsys):
+    """El caso real reportado: el proceso 'termina' (Face Enhancer al
+    100%) pero no deja ningún .mp4. Sin ver returncode/stdout no hay forma
+    de saber si crasheó, si quedó sin memoria de GPU, o algo más — así que
+    ambos tienen que quedar visibles, no solo la cola de stderr."""
+
+    def fake_run(cmd, capture_output, text):
+        return subprocess.CompletedProcess(
+            args=cmd, returncode=-9, stdout="algo en stdout", stderr=""
+        )
+
+    monkeypatch.setattr("src.animacion.subprocess.run", fake_run)
+
+    with pytest.raises(SadTalkerGenerationError):
+        create_ai_influencer("img.png", "audio.wav", result_dir=str(tmp_path), max_retries=0)
+
+    output = capsys.readouterr().out
+    assert "Return code: -9" in output
+    assert "algo en stdout" in output

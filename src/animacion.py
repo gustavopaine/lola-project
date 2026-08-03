@@ -124,7 +124,11 @@ def create_ai_influencer(image_path, audio_path, pose_style=0, still=False,
         except SadTalkerGenerationError as error:
             last_error = error
             print(f"[create_ai_influencer] intento {attempt}/{total_attempts} falló: {error}")
-            stderr_tail = (result.stderr or "")[-1000:]
+            print(f"Return code: {result.returncode}")
+            stdout_tail = (result.stdout or "")[-3000:]
+            if stdout_tail:
+                print(f"STDOUT (últimas líneas):\n{stdout_tail}")
+            stderr_tail = (result.stderr or "")[-3000:]
             if stderr_tail:
                 print(f"STDERR (últimas líneas):\n{stderr_tail}")
             if attempt < total_attempts:
