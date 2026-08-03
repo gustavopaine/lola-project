@@ -70,3 +70,19 @@ usando Secrets (`userdata.get(...)`) para `OPENAI_API_KEY` y `HF_TOKEN`.
 2. `git add . && git commit -m "..." && git push`.
 3. En Colab: `colab_bootstrap.ipynb` → correr todas las celdas.
 4. Nuevos guiones van en `src/config.py`, diccionario `GUIONES`.
+
+`init_lola` acepta un `guion_id` (ej. `"dia_1"`) que identifica el video
+final (`./results/dia_1.mp4`). Si ese archivo ya existe, la corrida se
+saltea por completo — así podés re-correr la Celda 13 sin miedo a
+regenerar un video que ya tenías. La etapa de SadTalker además reintenta
+automáticamente (`max_retries`, default 1) si detecta el fallo silencioso
+ya conocido (ver tabla de troubleshooting).
+
+## Tests
+
+La lógica de reintentos/verificación/idempotencia (sin GPU) tiene tests:
+
+```
+pip install -r requirements-dev.txt
+pytest
+```
