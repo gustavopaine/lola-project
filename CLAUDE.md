@@ -43,14 +43,18 @@ Four-stage pipeline, each stage a module in `src/`, chained by the orchestrator:
    a module-level global after first load).
 4. **`src/animacion.py`** (Etapa 3) — calls SadTalker's `inference.py` as a
    subprocess (`subprocess.run(capture_output=True)`) to produce the
-   lip-synced video. `create_ai_influencer` snapshots `result_dir` before
-   each attempt, then uses `_find_output_video` to diff against the
-   post-run listing and locate the new run's `.mp4` — this is how it
-   detects the known silent-failure mode (README: "video con 0 segundos /
-   carpeta solo con `first_frame_dir`") and retries up to `max_retries`
-   times (default 1) before raising `SadTalkerGenerationError` with the
-   captured stderr. `diagnosticar_error` still exists for manual ad-hoc
-   debugging outside `init_lola`. `still=False` (default) allows natural
+   lip-synced video. `create_ai_influencer` snapshots `result_dir` (files
+   *and* dirs — `_snapshot_results_entries`) before each attempt, then uses
+   `_find_output_video` to diff against the post-run listing and locate the
+   new run's `.mp4`. This has to check both, because SadTalker's own
+   `inference.py`, on success, moves the final video to a loose `.mp4`
+   sibling file and `shutil.rmtree`s its temp working dir (unless
+   `--verbose` is passed, which we don't) — a new *directory* only shows up
+   when the run failed partway through (README: "video con 0 segundos /
+   carpeta solo con `first_frame_dir`"). Retries up to `max_retries` times
+   (default 1) before raising `SadTalkerGenerationError` with the captured
+   stderr. `diagnosticar_error` still exists for manual ad-hoc debugging
+   outside `init_lola`. `still=False` (default) allows natural
    head movement; `still=True` restricts motion to lip-sync only.
 5. **`src/orquestador.py`** (Etapa 4) — `init_lola(script_text, characteristics,
    reusar_imagen, pose_style, guion_id, max_retries, result_dir)` chains the

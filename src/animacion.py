@@ -14,17 +14,13 @@ class SadTalkerGenerationError(Exception):
     los reintentos configurados."""
 
 
-def _snapshot_results_dirs(result_dir="./results"):
-    """Nombres de subcarpetas existentes en result_dir en este momento.
-    Se usa para detectar, por diferencia, qué carpeta creó una corrida
+def _snapshot_results_entries(result_dir="./results"):
+    """Nombres de archivos y carpetas existentes en result_dir en este
+    momento. Se usa para detectar, por diferencia, qué generó una corrida
     de inference.py."""
     if not os.path.isdir(result_dir):
         return set()
-    return {
-        name
-        for name in os.listdir(result_dir)
-        if os.path.isdir(os.path.join(result_dir, name))
-    }
+    return set(os.listdir(result_dir))
 
 
 def _find_output_video(before, result_dir="./results"):
@@ -32,32 +28,42 @@ def _find_output_video(before, result_dir="./results"):
     comparando el listado actual de result_dir contra el snapshot 'before'
     tomado antes de correrla.
 
-    Lanza SadTalkerGenerationError si la corrida no creó ninguna carpeta
-    nueva, si la carpeta nueva no contiene ningún .mp4 directamente adentro
-    (por ejemplo, si solo tiene first_frame_dir/ porque el proceso se cortó
-    a mitad de camino), o si el .mp4 encontrado pesa 0 bytes.
+    inference.py, cuando termina bien, mueve el video final a un .mp4
+    suelto directamente en result_dir (ej. results/2026_08_10_14.30.45.mp4)
+    y borra la carpeta de trabajo temporal que usó — salvo que se pase
+    --verbose, cosa que no hacemos. Si el proceso se corta a mitad de
+    camino, esa carpeta temporal queda huérfana en vez de reemplazada por
+    el .mp4. Por eso hay que mirar tanto archivos nuevos como carpetas
+    nuevas.
+
+    Lanza SadTalkerGenerationError si la corrida no generó nada nuevo, si
+    lo nuevo no incluye ningún .mp4 (por ejemplo, si solo quedó la carpeta
+    temporal con first_frame_dir/ porque el proceso se cortó a mitad de
+    camino), o si el .mp4 encontrado pesa 0 bytes.
     """
-    after = _snapshot_results_dirs(result_dir)
-    new_dirs = after - before
+    after = _snapshot_results_entries(result_dir)
+    new_entries = after - before
 
-    if not new_dirs:
+    if not new_entries:
         raise SadTalkerGenerationError(
-            f"SadTalker no se creó ninguna carpeta nueva en {result_dir}"
+            f"SadTalker no generó ninguna salida nueva en {result_dir}"
         )
 
-    newest_dir = max(
-        new_dirs, key=lambda name: os.path.getmtime(os.path.join(result_dir, name))
-    )
-    run_dir = os.path.join(result_dir, newest_dir)
+    candidates = []
+    for name in new_entries:
+        path = os.path.join(result_dir, name)
+        if os.path.isfile(path) and path.endswith(".mp4"):
+            candidates.append(path)
+        elif os.path.isdir(path):
+            candidates.extend(glob.glob(os.path.join(path, "*.mp4")))
 
-    videos = sorted(glob.glob(os.path.join(run_dir, "*.mp4")))
-    if not videos:
+    if not candidates:
         raise SadTalkerGenerationError(
-            f"La carpeta de resultado {run_dir} no contiene ningún .mp4 "
-            "(probablemente el proceso se cortó a mitad de camino)"
+            f"SadTalker generó algo nuevo en {result_dir} pero sin ningún .mp4 "
+            f"(probablemente el proceso se cortó a mitad de camino): {sorted(new_entries)}"
         )
 
-    video_path = videos[0]
+    video_path = max(candidates, key=os.path.getmtime)
     if os.path.getsize(video_path) == 0:
         raise SadTalkerGenerationError(f"El video generado {video_path} pesa 0 bytes")
 
@@ -110,7 +116,7 @@ def create_ai_influencer(image_path, audio_path, pose_style=0, still=False,
 
     for attempt in range(1, total_attempts + 1):
         liberar_gpu()
-        before = _snapshot_results_dirs(result_dir)
+        before = _snapshot_results_entries(result_dir)
         result = subprocess.run(cmd, capture_output=True, text=True)
 
         try:
