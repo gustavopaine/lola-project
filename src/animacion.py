@@ -46,7 +46,8 @@ def _find_output_video(before, result_dir="./results"):
 
     if not new_entries:
         raise SadTalkerGenerationError(
-            f"SadTalker no generó ninguna salida nueva en {result_dir}"
+            f"SadTalker no generó ninguna salida nueva en {result_dir} "
+            f"(cwd={os.getcwd()!r}, before={sorted(before)!r}, after={sorted(after)!r})"
         )
 
     candidates = []
